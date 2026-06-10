@@ -1,0 +1,65 @@
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0 1.5rem;
+  height: 56px;
+  background: var(--primary);
+  color: #fff;
+
+  .app-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.5rem;
+
+    a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 4px;
+      transition: all 0.15s;
+
+      &:hover, &.active {
+        color: #fff;
+        background: rgba(255,255,255,0.15);
+      }
+    }
+  }
+
+  .nav-user {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .user-email {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.75);
+    }
+  }
+}
+
+.btn-logout {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(255,255,255,0.25); }
+}
+
+main {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}

@@ -1,0 +1,19 @@
+@if (auth.isAuthenticated()) {
+  <nav class="app-nav">
+    <span class="app-name">OrdersApi</span>
+    <div class="nav-links">
+      <a routerLink="/orders" routerLinkActive="active">Pedidos</a>
+      <a routerLink="/jobs" routerLinkActive="active">Jobs</a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/users" routerLinkActive="active">Usuarios</a>
+      }
+    </div>
+    <div class="nav-user">
+      <span class="user-email">{{ auth.currentUserEmail() }}</span>
+      <button class="btn-logout" (click)="logout()">Salir</button>
+    </div>
+  </nav>
+}
+<main>
+  <router-outlet />
+</main>

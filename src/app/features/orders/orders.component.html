@@ -1,0 +1,121 @@
+<div class="page">
+  <div class="page-header">
+    <h2>Pedidos <span class="badge">{{ totalRecords }}</span></h2>
+    <button class="btn-primary" (click)="showCreateForm = !showCreateForm">
+      {{ showCreateForm ? 'Cancelar' : '+ Nuevo pedido' }}
+    </button>
+  </div>
+
+  @if (createSuccess) {
+    <p class="success-msg">Pedido creado correctamente.</p>
+  }
+
+  @if (showCreateForm) {
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+      <h3>Nuevo pedido</h3>
+
+      @if (createError) {
+        <p class="error-msg">{{ createError }}</p>
+      }
+
+      <div class="fields-row">
+        <div class="field">
+          <label>Customer ID</label>
+          <input type="number" formControlName="customerId" min="1" />
+          @if (form.controls.customerId.invalid && form.controls.customerId.touched) {
+            <span class="field-error">ID de cliente requerido (min. 1).</span>
+          }
+        </div>
+        <div class="field">
+          <label>External Reference</label>
+          <input type="text" formControlName="externalReference" />
+          @if (form.controls.externalReference.invalid && form.controls.externalReference.touched) {
+            <span class="field-error">Referencia requerida.</span>
+          }
+        </div>
+      </div>
+
+      <div class="items-section">
+        <div class="items-header">
+          <h4>Ítems</h4>
+          <button type="button" class="btn-secondary" (click)="addItem()">+ Agregar ítem</button>
+        </div>
+
+        <div formArrayName="items">
+          @for (item of itemsArray.controls; track $index) {
+            <div class="item-row" [formGroupName]="$index">
+              <div class="field">
+                <label>Producto</label>
+                <input type="text" formControlName="product" />
+              </div>
+              <div class="field field-sm">
+                <label>Cantidad</label>
+                <input type="number" formControlName="quantity" min="1" />
+              </div>
+              <div class="field field-sm">
+                <label>Precio</label>
+                <input type="number" formControlName="price" step="0.01" min="0.01" />
+              </div>
+              @if (itemsArray.length > 1) {
+                <button type="button" class="btn-danger-sm" (click)="removeItem($index)">✕</button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="createLoading">
+          {{ createLoading ? 'Creando…' : 'Crear pedido' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (loading) {
+    <p class="loading-msg">Cargando pedidos…</p>
+  } @else if (loadError) {
+    <p class="error-msg">{{ loadError }}</p>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Ref. Externa</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of orders; track order.id) {
+            <tr>
+              <td>{{ order.id }}</td>
+              <td>{{ order.customerName }}</td>
+              <td>{{ order.externalReference }}</td>
+              <td>{{ order.total | currency }}</td>
+              <td><span class="status-badge" [class]="order.status.toLowerCase()">{{ order.status }}</span></td>
+              <td>{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty-row">Sin pedidos.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages > 1) {
+      <div class="pagination">
+        @for (p of pages; track p) {
+          <button
+            class="page-btn"
+            [class.active]="p === currentPage"
+            (click)="loadPage(p)"
+          >{{ p }}</button>
+        }
+      </div>
+    }
+  }
+</div>

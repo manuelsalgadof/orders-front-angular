@@ -1,0 +1,42 @@
+<div class="page">
+  <div class="page-header">
+    <h2>Jobs de Reprocesamiento</h2>
+    <button class="btn-primary" [disabled]="loading || isPolling" (click)="reprocess()">
+      @if (loading || isPolling) { Procesando… } @else { Reprocesar pedidos }
+    </button>
+  </div>
+
+  <p class="description">
+    Ejecuta el SP <code>ProcessOrders</code>: cambia todos los pedidos <strong>Pending</strong> a <strong>Processed</strong>.
+  </p>
+
+  @if (error) {
+    <p class="error-msg">{{ error }}</p>
+  }
+
+  @if (job) {
+    <div class="card job-card">
+      <div class="job-header">
+        <span class="job-id">Job: {{ job.id }}</span>
+        <span class="status-badge" [class]="job.status.toLowerCase()">{{ job.status }}</span>
+        @if (isPolling) {
+          <span class="polling-indicator">Actualizando…</span>
+        }
+      </div>
+
+      <dl class="job-details">
+        <dt>Tipo</dt><dd>{{ job.type }}</dd>
+        <dt>Creado</dt><dd>{{ job.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}</dd>
+        @if (job.startedAt) {
+          <dt>Iniciado</dt><dd>{{ job.startedAt | date:'dd/MM/yyyy HH:mm:ss' }}</dd>
+        }
+        @if (job.finishedAt) {
+          <dt>Finalizado</dt><dd>{{ job.finishedAt | date:'dd/MM/yyyy HH:mm:ss' }}</dd>
+        }
+        @if (job.message) {
+          <dt>Mensaje</dt><dd>{{ job.message }}</dd>
+        }
+      </dl>
+    </div>
+  }
+</div>

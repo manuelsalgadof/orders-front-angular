@@ -1,0 +1,110 @@
+<div class="page">
+  <div class="page-header">
+    <h2>Usuarios <span class="badge">{{ totalRecords }}</span></h2>
+    <button class="btn-primary" (click)="showCreateForm = !showCreateForm">
+      {{ showCreateForm ? 'Cancelar' : '+ Nuevo usuario' }}
+    </button>
+  </div>
+
+  @if (createSuccess) {
+    <p class="success-msg">Usuario creado correctamente.</p>
+  }
+  @if (deleteError) {
+    <p class="error-msg">{{ deleteError }}</p>
+  }
+
+  @if (showCreateForm) {
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+      <h3>Nuevo usuario</h3>
+
+      @if (createError) {
+        <p class="error-msg">{{ createError }}</p>
+      }
+
+      <div class="fields-row">
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" formControlName="name" />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <span class="field-error">Nombre requerido.</span>
+          }
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" formControlName="email" />
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <span class="field-error">Email válido requerido.</span>
+          }
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" formControlName="password" />
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <span class="field-error">Contraseña requerida (mín. 8 caracteres).</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="createLoading">
+          {{ createLoading ? 'Creando…' : 'Crear usuario' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (loading) {
+    <p class="loading-msg">Cargando usuarios…</p>
+  } @else if (loadError) {
+    <p class="error-msg">{{ loadError }}</p>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Creado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users; track user.id) {
+            <tr>
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td><span class="role-badge" [class]="user.role.toLowerCase()">{{ user.role }}</span></td>
+              <td><span class="status-badge" [class]="user.status.toLowerCase()">{{ user.status }}</span></td>
+              <td>{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <button
+                  class="btn-danger-sm"
+                  [disabled]="deletingId === user.id"
+                  (click)="confirmDelete(user)"
+                >{{ deletingId === user.id ? '…' : 'Eliminar' }}</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty-row">Sin usuarios.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages > 1) {
+      <div class="pagination">
+        @for (p of pages; track p) {
+          <button
+            class="page-btn"
+            [class.active]="p === currentPage"
+            (click)="loadPage(p)"
+          >{{ p }}</button>
+        }
+      </div>
+    }
+  }
+</div>
