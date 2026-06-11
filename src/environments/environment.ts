@@ -1,5 +1,6 @@
-// TODO-CONFIG: set Azure Container App URL before production build
+// API_URL se inyecta vía build-arg de Docker (sed reemplaza el placeholder)
+// Para producción real: usar build-arg con URL del dominio productivo
 export const environment = {
   production: true,
-  apiUrl: ''
+  apiUrl: 'DOCKER_API_URL_PLACEHOLDER'
 };

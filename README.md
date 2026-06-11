@@ -201,6 +201,43 @@ export const environment = {
 
 ---
 
+## 🐳 Docker local
+
+Esta etapa no requiere dominio propio.
+
+| Servicio | URL |
+|----------|-----|
+| Frontend | http://localhost:4200 |
+| Backend  | http://localhost:8080 |
+
+### Build y run del frontend
+
+```bash
+# Build con API_URL
+docker build --build-arg API_URL=http://localhost:8080 -t orders-front .
+
+# Run standalone
+docker run -p 4200:80 orders-front
+```
+
+### Compose (backend + frontend)
+
+Desde `D:\Proyectos Personales\`:
+
+```bash
+# Copiar env.example → .env (en la raíz) y completar secrets del backend
+cp orders-front/env.example .env
+
+# Levantar todo
+docker-compose up --build
+```
+
+> **Nota:** `API_URL` es configuración pública del frontend, no un secreto.
+>
+> **Etapa futura:** configurar dominio productivo + CORS producción + HTTPS + proxy/API URL final.
+
+---
+
 ## 🛡️ Buenas prácticas aplicadas
 
 - Arquitectura Angular moderna (Standalone + Signals)
