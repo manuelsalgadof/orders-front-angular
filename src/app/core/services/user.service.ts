@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CreateUserRequest, UpdateUserRequest, UserListItem, UserResponse } from '../models/user.models';
-import { PagedResult } from '../models/order.models';
+import { PagedResult } from '../models/shared.models';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {

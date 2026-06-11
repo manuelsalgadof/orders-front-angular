@@ -52,9 +52,29 @@ export class AuthService {
       const parts = token.split('.');
       if (parts.length !== 3) return null;
       const padded = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      return JSON.parse(atob(padded)) as DecodedToken;
+      const raw: unknown = JSON.parse(atob(padded));
+      if (!raw || typeof raw !== 'object') return null;
+      const t = raw as Record<string, unknown>;
+      const mapped: Record<string, unknown> = {
+        exp: t['exp'],
+        role: t['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+        unique_name: t['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+        nameid: t['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+      };
+      return this.isDecodedToken(mapped) ? (mapped as DecodedToken) : null;
     } catch {
       return null;
     }
+  }
+
+  private isDecodedToken(value: unknown): value is DecodedToken {
+    if (!value || typeof value !== 'object') return false;
+    const t = value as Record<string, unknown>;
+    return (
+      typeof t['exp'] === 'number' &&
+      typeof t['role'] === 'string' &&
+      typeof t['unique_name'] === 'string' &&
+      typeof t['nameid'] === 'string'
+    );
   }
 }

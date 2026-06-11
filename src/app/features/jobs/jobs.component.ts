@@ -1,6 +1,8 @@
 import { Component, inject, OnDestroy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { interval, Subject, EMPTY, Subscription } from 'rxjs';
+import { switchMap, takeUntil, takeWhile, catchError } from 'rxjs/operators';
 import { JobService } from '../../core/services/job.service';
 import { JobResponse } from '../../core/models/job.models';
 
@@ -13,17 +15,19 @@ import { JobResponse } from '../../core/models/job.models';
 })
 export class JobsComponent implements OnDestroy {
   private jobService = inject(JobService);
+  private stopPolling$ = new Subject<void>();
+  private pollSub: Subscription | null = null;
 
   job: JobResponse | null = null;
   loading = false;
   error: string | null = null;
-  private pollingId: ReturnType<typeof setInterval> | null = null;
+  isPolling = false;
 
   reprocess(): void {
     this.loading = true;
     this.error = null;
     this.job = null;
-    this.stopPolling();
+    this.stopPolling$.next();
 
     this.jobService.reprocess().subscribe({
       next: (job) => {
@@ -43,29 +47,24 @@ export class JobsComponent implements OnDestroy {
   }
 
   private startPolling(id: string): void {
-    this.pollingId = setInterval(() => {
-      this.jobService.getById(id).subscribe({
-        next: (job) => {
-          this.job = job;
-          if (this.isTerminal(job.status)) this.stopPolling();
-        },
-        error: () => this.stopPolling()
-      });
-    }, 2000);
-  }
-
-  private stopPolling(): void {
-    if (this.pollingId !== null) {
-      clearInterval(this.pollingId);
-      this.pollingId = null;
-    }
+    this.isPolling = true;
+    this.pollSub = interval(2000).pipe(
+      switchMap(() => this.jobService.getById(id)),
+      takeUntil(this.stopPolling$),
+      takeWhile(job => !this.isTerminal(job.status), true),
+      catchError(() => EMPTY)
+    ).subscribe({
+      next: (job) => { this.job = job; },
+      complete: () => { this.isPolling = false; this.pollSub = null; }
+    });
   }
 
   private isTerminal(status: string): boolean {
     return status === 'Completed' || status === 'Failed';
   }
 
-  get isPolling(): boolean { return this.pollingId !== null; }
-
-  ngOnDestroy(): void { this.stopPolling(); }
+  ngOnDestroy(): void {
+    this.stopPolling$.next();
+    this.stopPolling$.complete();
+  }
 }
