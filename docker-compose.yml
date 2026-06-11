@@ -7,8 +7,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
     env_file:
-      - path: ../.env
-        required: false  # Crear .env en D:\Proyectos Personales\ desde env.example con secrets reales
+      - path: ../OrdersApi/.env
+        required: false  # Crear .env en OrdersApi/ desde OrdersApi/env.example con secrets reales
 
   orders-front:
     build:
